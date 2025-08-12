@@ -15,6 +15,7 @@ Item {
     // Attach custom tooltip
     StyledTooltip {
         id: styledTooltip
+        positionAbove: false
     }
 
     function getAppIcon(toplevel: Toplevel): string {
@@ -74,7 +75,6 @@ Item {
                     height: Math.max(12, Settings.settings.taskbarIconSize * 0.625)
                     anchors.centerIn: parent
                     source: getAppIcon(modelData)
-                    smooth: true
                     visible: source.toString() !== ""
                 }
 
@@ -83,7 +83,7 @@ Item {
                     visible: !appIcon.visible
                     text: appButton.appId ? appButton.appId.charAt(0).toUpperCase() : "?"
                     font.family: Theme.fontFamily
-                    font.pixelSize: Math.max(10, Settings.settings.taskbarIconSize * 0.4375)
+                    font.pixelSize: Math.max(10, Settings.settings.taskbarIconSize * 0.4375 * Theme.scale(Screen))
                     font.bold: true
                     color: appButton.isActive ? Theme.onAccent : Theme.textPrimary
                 }
@@ -95,7 +95,8 @@ Item {
                     cursorShape: Qt.PointingHandCursor
 
                     onEntered: {
-                        styledTooltip.text = appTitle || appId;
+                        var text = appTitle || appId;
+                        styledTooltip.text = text.length > 60 ? text.substring(0, 60) + "..." : text;
                         styledTooltip.targetItem = appButton;
                         styledTooltip.tooltipVisible = true;
                     }

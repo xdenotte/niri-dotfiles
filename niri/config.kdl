@@ -61,7 +61,7 @@ layout {
 
     border {
         width 2
-        active-color "#d38f90"
+        active-color "#bb955d"
         inactive-color "#505050"
     }
 
@@ -77,7 +77,7 @@ layout {
     shadow {
         on
         draw-behind-window false
-        color "#d38f90"
+        color "#bb955d"
         inactive-color "#505050"
     }
 }
@@ -85,16 +85,16 @@ layout {
 // --- Startup Applications ---
 spawn-at-startup "xwayland-satellite"
 spawn-at-startup "swww-daemon"
+spawn-at-startup "mate-polkit"
 spawn-at-startup "quickshell"
 spawn-at-startup "hypridle"
 spawn-at-startup "steam"
-spawn-at-startup "discord"
+spawn-at-startup "vesktop"
 
 // --- Environment Variables ---
 environment {
     DISPLAY ":0"
     STEAM_FORCE_DESKTOPUI_SCALING "1.25"
-    QT_QPA_PLATFORM "wayland"
     QT_AUTO_SCREEN_SCALE_FACTOR "1"
     ELECTRON_OZONE_PLATFORM_HINT "auto"
     QT_QPA_PLATFORMTHEME "qt6ct"
@@ -102,7 +102,6 @@ environment {
     MOZ_ENABLE_WAYLAND "1"
     TERMINAL "kitty"
     TERM "kitty"
-    SDL_VIDEODRIVER "wayland"
 }
 
 hotkey-overlay {
