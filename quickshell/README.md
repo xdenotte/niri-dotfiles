@@ -1,241 +1,587 @@
-# Noctalia
+# DankMaterialShell (dms)
 
-**_quiet by design_**
+<div align=center>
 
-<p align="center">
-  <a href="https://github.com/Ly-sec/Noctalia/commits">
-    <img src="https://img.shields.io/github/last-commit/Ly-sec/Noctalia?style=for-the-badge&labelColor=0C0D11&color=A8AEFF" alt="Last commit" />
-  </a>
-  <a href="https://github.com/Ly-sec/Noctalia/stargazers">
-    <img src="https://img.shields.io/github/stars/Ly-sec/Noctalia?style=for-the-badge&labelColor=0C0D11&color=A8AEFF" alt="GitHub stars" />
-  </a>
-  <a href="https://github.com/Ly-sec/Noctalia/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/Ly-sec/Noctalia?style=for-the-badge&labelColor=0C0D11&color=A8AEFF" alt="GitHub contributors" />
-  </a>
-  <a href="https://discord.gg/7JFFYWzWRn">
-    <img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&labelColor=0C0D11&color=A8AEFF&logo=discord&logoColor=white" alt="Discord" />
-  </a>
+[![GitHub stars](https://img.shields.io/github/stars/AvengeMedia/DankMaterialShell?style=for-the-badge&labelColor=101418&color=ffd700)](https://github.com/AvengeMedia/DankMaterialShell/stargazers)
+[![GitHub License](https://img.shields.io/github/license/AvengeMedia/DankMaterialShell?style=for-the-badge&labelColor=101418&color=b9c8da)](https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/AvengeMedia/DankMaterialShell?style=for-the-badge&labelColor=101418&color=9ccbfb)](https://github.com/AvengeMedia/DankMaterialShell/releases)
+[![GitHub last commit](https://img.shields.io/github/last-commit/AvengeMedia/DankMaterialShell?style=for-the-badge&labelColor=101418&color=9ccbfb)](https://github.com/AvengeMedia/DankMaterialShell/commits/master)
+[![AUR version](https://img.shields.io/aur/version/dms-shell?style=for-the-badge&labelColor=101418&color=9ccbfb)](https://aur.archlinux.org/packages/dms-shell)
+[![AUR version (git)](https://img.shields.io/aur/version/dms-shell-git?style=for-the-badge&labelColor=101418&color=9ccbfb&label=AUR%20(git))](https://aur.archlinux.org/packages/dms-shell-git)
 
+</div>
 
+A modern Wayland desktop shell built with [Quickshell](https://quickshell.org/) and designed for the [niri](https://github.com/YaLTeR/niri) and [Hyprland](https://hyprland.org/) compositors. Features Material 3 design principles with a heavy focus on functionality and customizability.
 
-</p>
+## Screenshots
 
-A sleek, minimal, and thoughtfully crafted setup for Wayland using **Quickshell**. This setup includes a status bar, notification system, control panel, wifi & bluetooth support, power profiles, lockscreen, tray, workspaces, and more — all styled with a warm lavender palette.
+<div align="center">
+<div style="max-width: 700px; margin: 0 auto;">
 
-## Preview
+https://github.com/user-attachments/assets/5ad934bb-e7aa-4c04-8d40-149181bd2d29
 
-<details>
-<summary>Click to expand preview images</summary>
+</div>
+</div>
 
-![Main](https://i.imgur.com/5mOIGD2.jpeg)  
-</br>
+<details><summary><strong>View More Screenshots</strong></summary>
 
-![Control Panel](https://i.imgur.com/fJmCV6m.jpeg)  
-</br>
-
-![Applauncher](https://i.imgur.com/9OPV30q.jpeg)
-
-</details>
 <br>
 
----
+<div align="center">
 
-> ⚠️ **Note:**  
-> This setup currently only supports **Niri** and **Hyprland** (for the most part), mostly due to the workspace integration. For anything else you will have to add your own workspace logic.
+### Desktop Overview
 
----
+<img src="https://github.com/user-attachments/assets/203a9678-c3b7-4720-bb97-853a511ac5c8" width="600" alt="DankMaterialShell Desktop" />
 
-## Features
+### Application Launcher
 
-- **Status Bar:** Modular and informative with smooth animations.
-- **Notifications:** Non-intrusive alerts styled to blend naturally.
-- **Control Panel:** Centralized system controls for quick adjustments.
-- **Connectivity:** Easy management of WiFi and Bluetooth devices.
-- **Power Profiles:** Quick toggles for CPU performance.
-- **Lockscreen:** Secure and visually consistent lock experience.
-- **Tray & Workspaces:** Efficient workspace switching and tray icons.
-- **Applauncher:** Stylized Applauncher to fit into the setup.
+<img src="https://github.com/user-attachments/assets/2da00ea1-8921-4473-a2a9-44a44535a822" width="450" alt="Spotlight Launcher" />
 
----
+### System Monitor
 
-<details>
-<summary><strong>Theme Colors</strong></summary>
+<img src="https://github.com/user-attachments/assets/b3c817ec-734d-4974-929f-2d11a1065349" width="600" alt="System Monitor" />
 
-| Color Role           | Color       | Description                |
-| -------------------- | ----------- | -------------------------- |
-| Background Primary   | `#0C0D11`   | Deep indigo-black          |
-| Background Secondary | `#151720`   | Slightly lifted dark       |
-| Background Tertiary  | `#1D202B`   | Soft contrast surface      |
-| Surface              | `#1A1C26`   | Material-like base layer   |
-| Surface Variant      | `#2A2D3A`   | Lightly elevated           |
-| Text Primary         | `#CACEE2`   | Gentle off-white           |
-| Text Secondary       | `#B7BBD0`   | Muted lavender-blue        |
-| Text Disabled        | `#6B718A`   | Dimmed blue-gray           |
-| Accent Primary       | `#A8AEFF`   | Light enchanted lavender   |
-| Accent Secondary     | `#9EA0FF`   | Softer lavender hue        |
-| Accent Tertiary      | `#8EABFF`   | Warm golden glow           |
-| Error                | `#FF6B81`   | Soft rose red              |
-| Warning              | `#FFBB66`   | Candlelight amber-orange   |
-| Highlight            | `#E3C2FF`   | Bright magical lavender    |
-| Ripple Effect        | `#F3DEFF`   | Gentle soft splash         |
-| On Accent            | `#1A1A1A`   | Text on accent background  |
-| Outline              | `#44485A`   | Subtle bluish-gray line    |
-| Shadow               | `#000000B3` | Standard soft black shadow |
-| Overlay              | `#11121ACC` | Deep bluish overlay        |
+### Widget Customization
+
+<img src="https://github.com/user-attachments/assets/903f7c60-146f-4fb3-a75d-a4823828f298" width="500" alt="Widget Customization" />
+
+### Lock Screen
+
+<img src="https://github.com/user-attachments/assets/3fa07de2-c1b0-4e57-8f25-3830ac6baf4f" width="600" alt="Lock Screen" />
+
+### Dynamic Theming
+
+<img src="https://github.com/user-attachments/assets/1994e616-f9d9-424a-9f60-6f06708bf12e" width="700" alt="Auto Theme" />
+
+### Notification Center
+
+<img src="https://github.com/user-attachments/assets/07cbde9a-0242-4989-9f97-5765c6458c85" width="350" alt="Notification Center" />
+
+### Dock
+
+<img src="https://github.com/user-attachments/assets/e6999daf-f7bf-4329-98fa-0ce4f0e7219c" width="400" alt="Dock" />
+
+</div>
 
 </details>
 
----
+## What's Inside
 
-## Installation & Usage
+**Core Widgets:**
 
-<details>
-<summary><strong>Installation</strong></summary>
+- **TopBar**: fully customizable bar where widgets can be added, removed, and re-arranged.
+  - **App Launcher** with fuzzy search, categories, and auto-sorting by most used apps.
+  - **Workspace Switcher** Dynamically resizing niri workspace switcher.
+  - **Focused Window** Displays the currently focused window app name and title.
+  - **Running Apps** A view of all running apps, sorted by monitor, workspace, then position on workspace.
+  - **Media Player** Short form media player with equalizer, song title, and controls.
+  - **Clock** Clock and date widget
+  - **Weather** Weather widget with customizable location
+  - **System Tray** System tray applets with context menus.
+  - **Process Monitor** CPU, RAM, and GPU usage percentages, temperatures. (requires [dgop](https://github.com/AvengeMedia/dgop))
+  - **Power/Battery** Power/Battery widget for battery metrics and power profile changing.
+  - **Notifications** Notification bell with a notification center popup
+  - **Control Center** High-level view of network, bluetooth, and audio status
+  - **Privacy Indicator** Attempts to reveal if a microphone or screen recording session is active, relying on Pipewire data sources
+  - **Idle Inhibitor** Creates a systemd idle inhibitor to prevent sleep/locking from occuring.
+- **Spotlight Launcher** A central app launcher/search that can be triggered via an IPC keybinding.
+- **Central Command** A combined music, weather, calendar, and events PopUp.
+- **Process List** A process list, with system metrics and information. More detailed modal available via IPC.
+- **Notification Center** A center for notifications that has support for grouping.
+- **Dock** A dock with pinned apps support, recent apps support, and currently running application support.
+- **Control Center** A full control center with user profile information, network, bluetooth, audio input/output, and display controls.
+- **Lock Screen** Using quickshell's WlSessionLock
 
-Install quickshell:
+**Features:**
 
+- Dynamic wallpaper-based theming with matugen integration
+- Numerous IPCs to trigger actions and open various modals.
+- Calendar integration with [khal](https://github.com/pimutils/khal)
+- Audio/media controls
+- Grouped notifications
+- Brightness control for internal and external displays
+- Qt and GTK app theming synchronization, as well as [Ghostty](https://ghostty.org/) auto-theme support.
+
+## Installation
+
+### Compositor Setup
+
+DankMaterialShell supports both **niri** and **Hyprland** compositors:
+
+**Niri**:
+```bash
+# Arch Linux
+paru -S niri-git
+
+# Fedora  
+sudo dnf copr enable alebastr/niri && sudo dnf install niri
 ```
-yay -S quickshell-git
+
+For detailed niri installation instructions, see the [niri Getting Started guide](https://yalter.github.io/niri/Getting-Started.html).
+
+**Hyprland**:
+```bash
+# Arch Linux
+sudo pacman -S hyprland
+
+# Or from AUR for latest
+paru -S hyprland-git
+
+# Fedora
+sudo dnf install hyprland
+
+# Or use Copr for latest builds
+sudo dnf copr enable solopasha/hyprland && sudo dnf install hyprland
 ```
 
-or use any other way of installing quickshell-git (flake, paru etc).
+For detailed Hyprland installation instructions, see the [Hyprland wiki](https://wiki.hypr.land/Getting-Started/Installation/).
 
-_Download and install the latest release:_
+### Quick Start
 
+We don't have a nice install setup yet to just isntall everything with some nice default dotfiles, but it's coming soon™ (it's pretty easy though, especially with niri)
+
+\*If you do not already have niri or Hyprland, see the Compositor Setup section below
+
+**Dependencies:**
+
+# Arch Linux
+```bash
+paru -S quickshell-git ttf-material-symbols-variable-git inter-font ttf-fira-code
 ```
-mkdir -p ~/.config/quickshell && curl -sL https://github.com/Ly-sec/Noctalia/releases/latest/download/noctalia-latest.tar.gz | tar -xz --strip-components=1 -C ~/.config/quickshell/
+
+# Fedora
+```bash
+sudo dnf copr enable errornointernet/quickshell && sudo dnf install quickshell-git rsms-inter-fonts fira-code-fonts
+```
+# Install icon fonts manually
+```bash
+mkdir -p ~/.local/share/fonts
+```
+```bash
+curl -L "https://github.com/google/material-design-icons/raw/master/variablefont/MaterialSymbolsRounded%5BFILL%2CGRAD%2Copsz%2Cwght%5D.ttf" -o ~/.local/share/fonts/MaterialSymbolsRounded.ttf
+```
+```bash
+fc-cache -f
 ```
 
-Or download manually from [releases](https://github.com/Ly-sec/Noctalia/releases) and extract:
+**Get the shell:**
 
+# Arch linux available via AUR
+```bash
+paru -S dankmaterialshell-git
 ```
-mkdir -p ~/.config/quickshell && tar -xzf noctalia-*.tar.gz --strip-components=1 -C ~/.config/quickshell/
+
+# Manual install
+```bash
+mkdir -p ~/.config/quickshell
+```
+```bash
+git clone https://github.com/AvengeMedia/DankMaterialShell.git ~/.config/quickshell/dms
+```
+```bash
+qs -c DankMaterialShell
 ```
 
-### _niri only_
+### Detailed Setup
 
-Add this to your `layout` section:
+<details><summary>Font Installation</summary>
 
-`background-color "transparent"`
+**Material Symbols (Required):**
 
-That is to make swww work properly.
+
+# Manual installation
+```bash
+mkdir -p ~/.local/share/fonts
+curl -L "https://github.com/google/material-design-icons/raw/master/variablefont/MaterialSymbolsRounded%5BFILL%2CGRAD%2Copsz%2Cwght%5D.ttf" -o ~/.local/share/fonts/MaterialSymbolsRounded.ttf
+fc-cache -f
+```
+
+# Arch Linux
+```bash
+paru -S ttf-material-symbols-variable-git
+```
+
+**Typography (Recommended):**
+
+
+# Inter Variable Font
+```bash
+curl -L "https://github.com/rsms/inter/releases/download/v4.0/Inter-4.0.zip" -o /tmp/Inter.zip
+unzip -j /tmp/Inter.zip "InterVariable.ttf" "InterVariable-Italic.ttf" -d ~/.local/share/fonts/
+rm /tmp/Inter.zip && fc-cache -f
+```
+
+# Fira Code
+```bash
+curl -L "https://github.com/tonsky/FiraCode/releases/download/6.2/Fira_Code_v6.2.zip" -o /tmp/FiraCode.zip
+unzip -j /tmp/FiraCode.zip "ttf/*.ttf" -d ~/.local/share/fonts/
+rm /tmp/FiraCode.zip && fc-cache -f
+```
 
 </details>
-</br>
 
-<details>
-<summary><strong>Usage</strong></summary>
+<details><summary>Optional Features</summary>
 
-### Start quickshell:
+**Enhanced Functionality:**
 
+# Install dgop on any distro (requires go 1.23+):
+```bash
+git clone https://github.com/AvengeMedia/dgop.git && cd dgop
+make && sudo make install
 ```
-qs
+
+# Arch Linux
+```bash
+sudo pacman -S cava wl-clipboard cliphist brightnessctl
+paru -S matugen dgop
+```
+# Fedora
+```bash
+sudo dnf install cava wl-clipboard brightnessctl
+sudo dnf copr enable wef/cliphist && sudo dnf install cliphist
+sudo dnf copr enable heus-sueh/packages && sudo dnf install matugen
 ```
 
-(If you want to autostart it, just add it to your niri configuration.)
+**What you get:**
 
-It is recommended to set the following in your Niri configuration (hyprland equivalent):
+- `dgop`: Ability to have system resource widgets, process list modal, and temperature monitoring.
+- `matugen`: Wallpaper-based dynamic theming
+- `brightnessctl`: Backlight and LED brightness control
+- `wl-clipboard`: Required for copying various elements to clipboard.
+- `cava`: Audio visualizer
+- `cliphist`: Clipboard history
+- `gammastep`: Night mode support
 
-```
-window-rule {
-    geometry-corner-radius 20
-    clip-to-geometry true
+</details>
+
+## Usage
+
+### Niri Integration
+
+Add to your niri config
+
+```bash
+// Required for clipboard history integration
+spawn-at-startup "bash" "-c" "wl-paste --watch cliphist store &"
+
+// Recommended (must install polkit-mate before hand) for elevation prompts
+spawn-at-startup "/usr/lib/mate-polkit/polkit-mate-authentication-agent-1"
+// This may be a different path on different distributions, the above is for the arch linux mate-polkit package
+
+// Starts DankShell
+spawn-at-startup "qs" "-c" "dms"
+
+// If using niri newer than 271534e115e5915231c99df287bbfe396185924d (~aug 17 2025)
+// you can add this to disable built in config load errors since dank shell provides this
+config-notification {
+    disable-failed
+}
+
+// Dank keybinds
+// 1. These should not be in conflict with any pre-existing keybindings
+// 2. You need to merge them with your existing config if you want to use these
+// 3. You can change the keys to whatever you want, if you prefer something different
+// 4. For the increment/decrement ones you can change the steps to whatever you like too
+binds {
+   Mod+Space hotkey-overlay-title="Application Launcher" {
+      spawn "qs" "-c" "dms" "ipc" "call" "spotlight" "toggle";
+   }
+   Mod+V hotkey-overlay-title="Clipboard Manager" {
+      spawn "qs" "-c" "dms" "ipc" "call" "clipboard" "toggle";
+   }
+   Mod+M hotkey-overlay-title="Task Manager" {
+      spawn "qs" "-c" "dms" "ipc" "call" "processlist" "toggle";
+   }
+   Mod+N hotkey-overlay-title="Notification Center" {
+      spawn "qs" "-c" "dms" "ipc" "call" "notifications" "toggle";
+   }
+   Mod+Comma hotkey-overlay-title="Settings" {
+      spawn "qs" "-c" "dms" "ipc" "call" "settings" "toggle";
+   }
+   Super+Alt+L hotkey-overlay-title="Lock Screen" {
+      spawn "qs" "-c" "dms" "ipc" "call" "lock" "lock";
+   }
+   XF86AudioRaiseVolume allow-when-locked=true {
+      spawn "qs" "-c" "dms" "ipc" "call" "audio" "increment" "3";
+   }
+   XF86AudioLowerVolume allow-when-locked=true {
+      spawn "qs" "-c" "dms" "ipc" "call" "audio" "decrement" "3";
+   }
+   XF86AudioMute allow-when-locked=true {
+      spawn "qs" "-c" "dms" "ipc" "call" "audio" "mute";
+   }
+   XF86AudioMicMute allow-when-locked=true {
+      spawn "qs" "-c" "dms" "ipc" "call" "audio" "micmute";
+   }
+   XF86MonBrightnessUp allow-when-locked=true {
+      spawn "qs" "-c" "dms" "ipc" "call" "brightness" "increment" "5" "";
+   }
+   // You can override the default device for e.g. keyboards by adding the device name to the last param
+   XF86MonBrightnessDown allow-when-locked=true {
+      spawn "qs" "-c" "dms" "ipc" "call" "brightness" "decrement" "5" "";
+   }
 }
 ```
 
-### Settings:
+### Hyprland Integration
 
-To make the weather widget, wallpaper manager and record button work you will have to open up the settings menu in to right panel (top right button to open panel) and edit said things accordingly.
+Add to your Hyprland config (`~/.config/hypr/hyprland.conf`):
 
-### Launcher:
+```bash
+# Required for clipboard history integration
+exec-once = bash -c "wl-paste --watch cliphist store &"
 
-The launcher supports special commands for math calculation and clipboard history.
-Once the launcher open you can invoke those special command by typing ">"
-* \>calc : lets you do simple math
-* \>clip : shows clipboard history
+# Recommended (must install polkit-mate beforehand) for elevation prompts  
+exec-once = /usr/lib/mate-polkit/polkit-mate-authentication-agent-1
+# This may be a different path on different distributions, the above is for the arch linux mate-polkit package
+
+# Starts DankShell
+exec-once = qs -c dms
+
+# Dank keybinds
+# 1. These should not be in conflict with any pre-existing keybindings
+# 2. You need to merge them with your existing config if you want to use these
+# 3. You can change the keys to whatever you want, if you prefer something different
+# 4. For the increment/decrement ones you can change the steps to whatever you like too
+
+# Application and system controls
+bind = SUPER, Space, exec, qs -c dms ipc call spotlight toggle
+bind = SUPER, V, exec, qs -c dms ipc call clipboard toggle
+bind = SUPER, M, exec, qs -c dms ipc call processlist toggle
+bind = SUPER, N, exec, qs -c dms ipc call notifications toggle
+bind = SUPER, comma, exec, qs -c dms ipc call settings toggle
+bind = SUPERALT, L, exec, qs -c dms ipc call lock lock
+
+# Audio controls (function keys)
+bindl = , XF86AudioRaiseVolume, exec, qs -c dms ipc call audio increment 3
+bindl = , XF86AudioLowerVolume, exec, qs -c dms ipc call audio decrement 3
+bindl = , XF86AudioMute, exec, qs -c dms ipc call audio mute
+bindl = , XF86AudioMicMute, exec, qs -c dms ipc call audio micmute
+
+# Brightness controls (function keys)
+bindl = , XF86MonBrightnessUp, exec, qs -c dms ipc call brightness increment 5 ""
+# You can override the default device for e.g. keyboards by adding the device name to the last param
+bindl = , XF86MonBrightnessDown, exec, qs -c dms ipc call brightness decrement 5 ""
+```
+
+### IPC Commands
+
+Control everything from the command line, or via keybinds. For comprehensive documentation of all available IPC commands, see [docs/IPC.md](docs/IPC.md).
+
+
+# Audio control
+```bash
+qs -c dms ipc call audio setvolume 50
+qs -c dms ipc call audio mute
+```
+# Launch applications
+```bash
+qs -c dms ipc call spotlight toggle
+qs -c dms ipc call processlist toggle
+```
+# System control
+```
+qs -c dms ipc call wallpaper set /path/to/image.jpg
+qs -c dms ipc call theme toggle
+qs -c dms ipc call lock lock
+```
+# Media control
+```
+qs -c dms ipc call mpris playPause
+qs -c dms ipc call mpris next
+```
+
+## Theming
+
+### Custom Themes
+
+DankMaterialShell supports custom color themes! You can create your own Material Design 3 color schemes or use pre-made themes like Cyberpunk Electric, Hotline Miami, and Miami Vice.
+
+For detailed instructions on creating and using custom themes, see [docs/CUSTOM_THEMES.md](docs/CUSTOM_THEMES.md).
+
+### System App Integration
+
+There's two toggles in the appearance section of settings, for GTK and QT apps.
+
+These settings will override some local GTK and QT configuration files, you can still integrate auto-theming if you do not wish DankShell to mess with your QTCT/GTK files.
+
+No matter what when matugen is enabled the files will be created on wallpaper changes:
+
+- ~/.config/gtk-3.0/dank-colors.css
+- ~/.config/gtk-4.0/dank-colors.css
+- ~/.config/qt6ct/colors/matugen.conf
+- ~/.config/qt5ct/colors/matugen.conf
+
+If you do not like our theme path, you can integrate this with other GTK themes, matugen themes, etc.
+
+**GTK Apps:**
+
+1. Install [Colloid](https://github.com/vinceliuice/Colloid-gtk-theme)
+
+Colloid is a hard requirement for the auto-theming because of how it integrates with colloid css files, however you can integrate auto-theming with other themes, you just have to do it manually (so leave the toggle OFF in settings)
+
+It will still create `~/.config/gtk-3.0/4.0/dank-colors.css` on theme updates, these you can import into other compatible GTK themes.
+
+```bash
+# Some default install settings for colloid
+./install.sh -s standard -l --tweaks normal
+```
+
+Configure in `~/.config/gtk-3.0/settings.ini` and `~/.config/gtk-4.0/settings.ini`:
+
+```ini
+[Settings]
+gtk-theme-name=Colloid
+```
+
+**Qt Apps:**
+
+You have **two** paths for QT theming, first path is to use **gtk3**. To do that, add the following to your niri config.
+
+```kdl
+environment {
+  // Add to existing environment block
+  QT_QPA_PLATFORMTHEME "gtk3"
+  QT_QPA_PLATFORMTHEME_QT6 "gtk3"
+}
+```
+
+**Done** - if you're not happy with this and wish to use Breeze or another QT theme then continue on.
+
+1. Install qt6ct and qt5ct
+
+
+## Arch
+```bash
+sudo pacman -S qt5ct qt6ct
+```
+## Fedora
+```bash
+sudo dnf install qt5ct qt6ct
+```
+
+2. Configure Environment in niri
+
+```kdl
+  // Add to existing environment block
+  QT_QPA_PLATFORMTHEME "qt5ct"
+  QT_QPA_PLATFORMTHEME_QT6 "qt6ct"
+```
+
+You'll have to restart your session for themes to take effect.
+
+## Terminal Integration
+
+**Ghostty users** can add automatic color theming:
+
+```bash
+echo "config-file = ./config-dankcolors" >> ~/.config/ghostty/config
+```
+
+## Calendar Setup
+
+Sync your caldev compatible calendar (Google, Office365, etc.) for dashboard integration:
+
+<details><summary>Configuration Steps</summary>
+
+**Install dependencies:**
+
+
+# Arch
+```bash
+sudo pacman -S vdirsyncer khal python-aiohttp-oauthlib
+```
+
+# Fedora
+```bash
+sudo dnf install python3-vdirsyncer khal python3-aiohttp-oauthlib
+```
+
+**Configure vdirsyncer** (`~/.vdirsyncer/config`):
+
+```ini
+[general]
+status_path = "~/.calendars/status"
+
+[pair personal_sync]
+a = "personal"
+b = "personallocal"
+collections = ["from a", "from b"]
+conflict_resolution = "a wins"
+metadata = ["color"]
+
+[storage personal]
+type = "google_calendar"
+token_file = "~/.vdirsyncer/google_calendar_token"
+client_id = "your_client_id"
+client_secret = "your_client_secret"
+
+[storage personallocal]
+type = "filesystem"
+path = "~/.calendars/Personal"
+fileext = ".ics"
+```
+
+**Setup sync:**
+
+```bash
+vdirsyncer sync
+khal configure
+```
+
+# Auto-sync every 5 minutes
+```bash
+crontab -e
+# Add: */5 * * * * /usr/bin/vdirsyncer sync
+```
 
 </details>
 
-</br>
-<details>
-<summary><strong>Keybinds</strong></summary>
+## Configuration
 
-### Toggle Applauncher:
-
+All settings are configurable in
 ```
- qs ipc call globalIPC toggleLauncher
+~/.config/DankMaterialShell/settings.json`, or more intuitively the built-in settings modal.
 ```
 
-### Toggle Lockscreen:
+**Key configuration areas:**
 
-```
- qs ipc call globalIPC toggleLock
-```
+- Widget positioning and behavior
+- Theme and color preferences
+- Time format, weather units and location
+- Light/Dark modes
+- Wallpaper and Profile picture
+- Dock enable/disable and various tunes.
 
-### Toggle Notification Popup:
+## Troubleshooting
 
-```
-qs ipc call globalIPC toggleNotificationPopup
-```
+**Common issues:**
 
-### Toggle Idle Inhibitor:
+- **Missing icons:** Verify Material Symbols font installation with `fc-list | grep Material`
+- **No dynamic theming:** Install matugen and enable in settings
+- **Qt apps not themed:** Configure qt5ct/qt6ct and set QT_QPA_PLATFORMTHEME
+- **Calendar not syncing:** Check vdirsyncer credentials and network connectivity
 
-```
-qs ipc call globalIPC toggleIdleInhibitor
-```
-</details>
+**Getting help:**
 
----
-
-## Dependencies
-
-You will need to install a few things to get everything working:
-
-- `cava` so the audio visualizer works
-- `gpu-screen-recorder` so that the record button works
-- `xdg-desktop-portal-gnome` or any other xdg-desktop-portal (for `gpu-screen-recorder`)
-- `material-symbols-git` so the icons properly show up
-- `swww` to add fancy wallpaper animations (optional)
-- `wallust` to theme the setup based on wallpaper (optional)
-
-## zigstat and zigbrightness
-
-The zigstat and zigbrightness utilities are automatically built from source during release creation. Source code can be found [here](https://git.pika-os.com/wm-packages/pikabar/src/branch/main/src).
-
-## Known issues
-
-It is perfect now
-
----
-
-## 💜 Credits
-
-Huge thanks to [**@ferrreo**](https://github.com/ferrreo) and [**@quadbyte**](https://github.com/quadbyte) for all the changes they did and all the cool features they added!
-
----
+- Check the [issues](https://github.com/AvengeMedia/DankMaterialShell/issues) for known problems
+- Share logs from `qs -c dms` for debugging
+- Join the niri community for compositor-specific questions
 
 ## Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests.
+DankMaterialShell welcomes contributions! Whether it's bug fixes, new widgets, theme improvements, or documentation updates - all help is appreciated.
 
----
+**Areas that need attention:**
 
-#### Donation
+- More widget options and customization
+- Additional compositor compatibility
+- Performance optimizations
+- Documentation and examples
 
----
-While I actually didn't want to accept donations, more and more people are asking to donate so... I don't know, if you really feel like donating then I obviously highly appreciate it but **PLEASE** never feel forced to donate or anything. It won't change how I work on Noctalia, it's a project that I work on for fun in the end.
+## Credits
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R01IX85B)
-
----
-
-#### Special Thanks
-
-Thank you to everyone who supports me and this project 💜!
-* Gohma
-
----
-
-## License
-
-This project is licensed under the terms of the [MIT License](./LICENSE).
+- [quickshell](https://quickshell.org/) the core of what makes a shell like this possible.
+- [niri](https://github.com/YaLTeR/niri) for the awesome scrolling compositor.
+- [soramanew](https://github.com/soramanew) who built [caelestia](https://github.com/caelestia-dots/shell) which served as inspiration and guidance for many dank widgets.
+- [end-4](https://github.com/end-4) for [dots-hyprland](https://github.com/end-4/dots-hyprland) which also served as inspiration and guidance for many dank widgets.

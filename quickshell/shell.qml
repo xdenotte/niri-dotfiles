@@ -1,211 +1,282 @@
+//@ pragma UseQApplication
+import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Services.Pipewire
-import Quickshell.Services.Notifications
-import QtQuick
-import QtCore
-import qs.Bar
-import qs.Bar.Modules
-import qs.Widgets
-import qs.Widgets.LockScreen
-import qs.Widgets.Notification
-import qs.Widgets.SettingsWindow
-import qs.Settings
-import qs.Helpers
+import Quickshell.Widgets
+import qs.Modals
+import qs.Modules
+import qs.Modules.AppDrawer
+import qs.Modules.OSD
+import qs.Modules.CentcomCenter
+import qs.Modules.ControlCenter
+import qs.Modules.ControlCenter.Network
+import qs.Modules.Lock
+import qs.Modules.Notifications.Center
+import qs.Modules.Notifications.Popup
+import qs.Modules.ProcessList
+import qs.Modules.Settings
+import qs.Modules.TopBar
+import qs.Modules.Dock
+import qs.Services
+import qs.Common
 
-Scope {
+ShellRoot {
     id: root
 
-    property var notificationHistoryWin: notificationHistoryLoader.active ? notificationHistoryLoader.item : null
-    property var settingsWindow: null
-    property bool pendingReload: false
-    
-    // Function to load notification history
-    function loadNotificationHistory() {
-        if (!notificationHistoryLoader.active) {
-            notificationHistoryLoader.loading = true;
-        }
-        return notificationHistoryLoader;
-    }
-
-    // Helper function to round value to nearest step
-    function roundToStep(value, step) {
-        return Math.round(value / step) * step;
-    }
-
-    // Volume property reflecting current audio volume in 0-100
-    // Will be kept in sync dynamically below
-    property int volume: (defaultAudioSink && defaultAudioSink.audio && !defaultAudioSink.audio.muted)
-                        ? Math.round(defaultAudioSink.audio.volume * 100)
-                        : 0
-
-    // Function to update volume with clamping, stepping, and applying to audio sink
-    function updateVolume(vol) {
-        var clamped = Math.max(0, Math.min(100, vol));
-        var stepped = roundToStep(clamped, 5);
-        if (defaultAudioSink && defaultAudioSink.audio) {
-            defaultAudioSink.audio.volume = stepped / 100;
-        }
-        volume = stepped;
-    }
-
     Component.onCompleted: {
-        Quickshell.shell = root;
+        PortalService.init()
     }
 
-    Background {}
-    Overview {}
+    WallpaperBackground {}
 
-    Bar {
-        id: bar
-        shell: root
-        property var notificationHistoryWin: notificationHistoryLoader.active ? notificationHistoryLoader.item : null
+    Lock {
+        id: lock
+
+        anchors.fill: parent
     }
 
-    Dock {
-        id: dock
-    }
+    Variants {
+        model: SettingsData.getFilteredScreens("topBar")
 
-    Applauncher {
-        id: appLauncherPanel
-        visible: false
-    }
-
-    LockScreen {
-        id: lockScreen
-        onLockedChanged: {
-            if (!locked && root.pendingReload) {
-                reloadTimer.restart();
-                root.pendingReload = false;
-            }
+        delegate: TopBar {
+            modelData: item
         }
     }
 
-    IdleInhibitor {
-        id: idleInhibitor
-    }
+    Variants {
+        model: SettingsData.getFilteredScreens("dock")
 
-    NotificationServer {
-        id: notificationServer
-        onNotification: function (notification) {
-            console.log("[Notification] Received notification:", notification.appName, "-", notification.summary);
-            notification.tracked = true;
-            if (notificationPopup.notificationsVisible) {
-                // Add notification to the popup manager
-                notificationPopup.addNotification(notification);
-            }
-            if (notificationHistoryLoader.active && notificationHistoryLoader.item) {
-                notificationHistoryLoader.item.addToHistory({
-                    id: notification.id,
-                    appName: notification.appName || "Notification",
-                    summary: notification.summary || "",
-                    body: notification.body || "",
-                    urgency: notification.urgency,
-                    timestamp: Date.now()
-                });
-            }
-        }
-    }
+        delegate: Dock {
+            modelData: item
+            contextMenu: dockContextMenuLoader.item ? dockContextMenuLoader.item : null
 
-    NotificationPopup {
-        id: notificationPopup
-    }
-
-    // LazyLoader for NotificationHistory - only load when needed
-    LazyLoader {
-        id: notificationHistoryLoader
-        loading: false
-        component: NotificationHistory {}
-    }
-
-    // Centralized LazyLoader for SettingsWindow - prevents crashes on multiple opens
-    LazyLoader {
-        id: settingsWindowLoader
-        loading: false
-        component: SettingsWindow {
             Component.onCompleted: {
-                root.settingsWindow = this;
+                dockContextMenuLoader.active = true
             }
         }
     }
 
-    // Function to safely show/hide settings window
-    function toggleSettingsWindow() {
-        if (!settingsWindowLoader.active) {
-            settingsWindowLoader.loading = true;
-        }
-        
-        if (settingsWindowLoader.item) {
-            settingsWindowLoader.item.visible = !settingsWindowLoader.item.visible;
-        }
-    }
-
-    // Reference to the default audio sink from Pipewire
-    property var defaultAudioSink: Pipewire.defaultAudioSink
-
-    PwObjectTracker {
-        objects: [Pipewire.defaultAudioSink]
-    }
-
-    IPCHandlers {
-        appLauncherPanel: appLauncherPanel
-        lockScreen: lockScreen
-        idleInhibitor: idleInhibitor
-        notificationPopup: notificationPopup
-    }
-
-    Connections {
-        function onReloadCompleted() {
-            Quickshell.inhibitReloadPopup();
-        }
-
-        function onReloadFailed() {
-            Quickshell.inhibitReloadPopup();
-        }
-
-        target: Quickshell
-    }
-
-    Timer {
-        id: reloadTimer
-        interval: 500 // ms
-        repeat: false
-        onTriggered: Quickshell.reload(true)
-    }
-
-    Connections {
-        target: Quickshell
-        function onScreensChanged() {
-            if (lockScreen.locked) {
-                pendingReload = true;
-            } /*else {
-                reloadTimer.restart();
-            } */
-            // ^commented out for now to fix QS crash on monitor wake.
-            // if it reintroduces the notification bug (https://github.com/Ly-sec/Noctalia/issues/32)...
-            // we need to find a different fix
-        }
-    }
-
-    Connections {
-        target: defaultAudioSink ? defaultAudioSink.audio : null
-        function onVolumeChanged() {
-            if (defaultAudioSink.audio && !defaultAudioSink.audio.muted) {
-                volume = Math.round(defaultAudioSink.audio.volume * 100);
-                console.log("Volume changed externally to:", volume);
-            }
-        }
-        function onMutedChanged() {
-            if (defaultAudioSink.audio) {
-                if (defaultAudioSink.audio.muted) {
-                    volume = 0;
-                    console.log("Audio muted, volume set to 0");
-                } else {
-                    volume = Math.round(defaultAudioSink.audio.volume * 100);
-                    console.log("Audio unmuted, volume restored to:", volume);
-                }
+    Loader {
+        id: centcomPopoutLoader
+        active: false
+        sourceComponent: Component {
+            CentcomPopout {
+                id: centcomPopout
             }
         }
     }
 
+    LazyLoader {
+        id: dockContextMenuLoader
+        active: false
+
+        DockContextMenu {
+            id: dockContextMenu
+        }
+    }
+
+
+    LazyLoader {
+        id: notificationCenterLoader
+        active: false
+
+        NotificationCenterPopout {
+            id: notificationCenter
+        }
+    }
+
+    Variants {
+        model: SettingsData.getFilteredScreens("notifications")
+
+        delegate: NotificationPopupManager {
+            modelData: item
+        }
+    }
+
+    LazyLoader {
+        id: controlCenterLoader
+        active: false
+
+        ControlCenterPopout {
+            id: controlCenterPopout
+
+            onPowerActionRequested: (action, title, message) => {
+                                        powerConfirmModalLoader.active = true
+                                        if (powerConfirmModalLoader.item) {
+                                            powerConfirmModalLoader.item.show(
+                                                action, title, message)
+                                        }
+                                    }
+            onLockRequested: {
+                lock.activate()
+            }
+        }
+    }
+
+    LazyLoader {
+        id: wifiPasswordModalLoader
+        active: false
+
+        WifiPasswordModal {
+            id: wifiPasswordModal
+        }
+    }
+
+    LazyLoader {
+        id: networkInfoModalLoader
+        active: false
+
+        NetworkInfoModal {
+            id: networkInfoModal
+        }
+    }
+
+    LazyLoader {
+        id: batteryPopoutLoader
+        active: false
+
+        BatteryPopout {
+            id: batteryPopout
+        }
+    }
+
+    LazyLoader {
+        id: powerMenuLoader
+        active: false
+
+        PowerMenu {
+            id: powerMenu
+            onPowerActionRequested: (action, title, message) => {
+                                        powerConfirmModalLoader.active = true
+                                        if (powerConfirmModalLoader.item) {
+                                            powerConfirmModalLoader.item.show(
+                                                action, title, message)
+                                        }
+                                    }
+        }
+    }
+
+    LazyLoader {
+        id: powerConfirmModalLoader
+        active: false
+
+        PowerConfirmModal {
+            id: powerConfirmModal
+        }
+    }
+
+    LazyLoader {
+        id: processListPopoutLoader
+        active: false
+
+        ProcessListPopout {
+            id: processListPopout
+        }
+    }
+
+    SettingsModal {
+        id: settingsModal
+    }
+
+    LazyLoader {
+        id: appDrawerLoader
+        active: false
+
+        AppDrawerPopout {
+            id: appDrawerPopout
+        }
+    }
+
+    SpotlightModal {
+        id: spotlightModal
+    }
+
+    ClipboardHistoryModal {
+        id: clipboardHistoryModalPopup
+    }
+
+    NotificationModal {
+        id: notificationModal
+    }
+
+    LazyLoader {
+        id: processListModalLoader
+
+        active: false
+
+        ProcessListModal {
+            id: processListModal
+        }
+    }
+
+    IpcHandler {
+        function open() {
+            processListModalLoader.active = true
+            if (processListModalLoader.item)
+                processListModalLoader.item.show()
+
+            return "PROCESSLIST_OPEN_SUCCESS"
+        }
+
+        function close() {
+            if (processListModalLoader.item)
+                processListModalLoader.item.hide()
+
+            return "PROCESSLIST_CLOSE_SUCCESS"
+        }
+
+        function toggle() {
+            processListModalLoader.active = true
+            if (processListModalLoader.item)
+                processListModalLoader.item.toggle()
+
+            return "PROCESSLIST_TOGGLE_SUCCESS"
+        }
+
+        target: "processlist"
+    }
+
+    Variants {
+        model: SettingsData.getFilteredScreens("toast")
+
+        delegate: Toast {
+            modelData: item
+            visible: ToastService.toastVisible
+        }
+    }
+
+    Variants {
+        model: SettingsData.getFilteredScreens("osd")
+
+        delegate: VolumeOSD {
+            modelData: item
+        }
+    }
+
+
+
+
+    Variants {
+        model: SettingsData.getFilteredScreens("osd")
+
+        delegate: MicMuteOSD {
+            modelData: item
+        }
+    }
+
+    Variants {
+        model: SettingsData.getFilteredScreens("osd")
+
+        delegate: BrightnessOSD {
+            modelData: item
+        }
+    }
+
+    Variants {
+        model: SettingsData.getFilteredScreens("osd")
+
+        delegate: IdleInhibitorOSD {
+            modelData: item
+        }
+    }
 }
