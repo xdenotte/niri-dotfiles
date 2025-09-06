@@ -1,14 +1,17 @@
 pragma Singleton
+
 pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
 import qs.Common
 
 Singleton {
     id: root
 
+    property bool hasUwsm: false
     property bool isElogind: false
     property bool inhibitorAvailable: true
     property bool idleInhibited: false
@@ -19,14 +22,63 @@ Singleton {
     }
 
     Process {
+        id: detectUwsmProcess
+        running: false
+        command: ["which", "uwsm"]
+
+        onExited: function (exitCode) {
+            hasUwsm = (exitCode === 0)
+        }
+    }
+
+    Process {
         id: detectElogindProcess
         running: false
-        command: ["sh", "-c", "ps -eo comm= | grep -Fx elogind-daemon"]
+        command: ["sh", "-c", "ps -eo comm= | grep -E '^(elogind|elogind-daemon)$'"]
 
         onExited: function (exitCode) {
             console.log("SessionService: Elogind detection exited with code", exitCode)
             isElogind = (exitCode === 0)
         }
+    }
+
+    Process {
+        id: uwsmLogout
+        command: ["uwsm", "stop"]
+        running: false
+
+        stdout: SplitParser {
+            splitMarker: "\n"
+            onRead: data => {
+                if (data.trim().toLowerCase().includes("not running")) {
+                    _logout()
+                }
+            }
+        }
+
+        onExited: function (exitCode) {
+            if (exitCode === 0) {
+                return
+            }
+            _logout()
+        }
+    }
+
+    function logout() {
+        if (hasUwsm) {
+            uwsmLogout.running = true
+        }
+        _logout()
+    }
+
+    function _logout() {
+        if (CompositorService.isNiri) {
+            NiriService.quit()
+            return
+        }
+
+        // Hyprland fallback
+        Hyprland.dispatch("exit")
     }
 
     function suspend() {
@@ -45,15 +97,17 @@ Singleton {
     signal inhibitorChanged
 
     function enableIdleInhibit() {
-        if (idleInhibited)
+        if (idleInhibited) {
             return
+        }
         idleInhibited = true
         inhibitorChanged()
     }
 
     function disableIdleInhibit() {
-        if (!idleInhibited)
+        if (!idleInhibited) {
             return
+        }
         idleInhibited = false
         inhibitorChanged()
     }
@@ -74,8 +128,9 @@ Singleton {
             idleInhibited = false
 
             Qt.callLater(() => {
-                             if (wasActive)
-                             idleInhibited = true
+                             if (wasActive) {
+                                 idleInhibited = true
+                             }
                          })
         }
     }
@@ -88,16 +143,14 @@ Singleton {
                 return ["true"]
             }
 
-            return [isElogind ? "elogind-inhibit" : "systemd-inhibit", "--what=idle", "--who=quickshell", "--why="
-                    + inhibitReason, "--mode=block", "sleep", "infinity"]
+            return [isElogind ? "elogind-inhibit" : "systemd-inhibit", "--what=idle", "--who=quickshell", `--why=${inhibitReason}`, "--mode=block", "sleep", "infinity"]
         }
 
         running: idleInhibited
 
         onExited: function (exitCode) {
             if (idleInhibited && exitCode !== 0) {
-                console.warn("SessionService: Inhibitor process crashed with exit code:",
-                             exitCode)
+                console.warn("SessionService: Inhibitor process crashed with exit code:", exitCode)
                 idleInhibited = false
                 ToastService.showWarning("Idle inhibitor failed")
             }
@@ -126,11 +179,11 @@ Singleton {
 
         function reason(newReason: string): string {
             if (!newReason) {
-                return "Current reason: " + root.inhibitReason
+                return `Current reason: ${root.inhibitReason}`
             }
 
             root.setInhibitReason(newReason)
-            return "Inhibit reason set to: " + newReason
+            return `Inhibit reason set to: ${newReason}`
         }
 
         target: "inhibit"

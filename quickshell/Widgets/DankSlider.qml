@@ -14,12 +14,22 @@ Item {
     property string unit: "%"
     property bool showValue: true
     property bool isDragging: false
+    property bool wheelEnabled: true
     readonly property bool containsMouse: sliderMouseArea.containsMouse
 
     signal sliderValueChanged(int newValue)
     signal sliderDragFinished(int finalValue)
 
     height: 40
+
+    function updateValueFromPosition(x) {
+        let ratio = Math.max(0, Math.min(1, (x - sliderHandle.width / 2) / (sliderTrack.width - sliderHandle.width)))
+        let newValue = Math.round(minimum + ratio * (maximum - minimum))
+        if (newValue !== value) {
+            value = newValue
+            sliderValueChanged(newValue)
+        }
+    }
 
     Row {
         anchors.centerIn: parent
@@ -40,9 +50,7 @@ Item {
             property int leftIconWidth: slider.leftIcon.length > 0 ? Theme.iconSize : 0
             property int rightIconWidth: slider.rightIcon.length > 0 ? Theme.iconSize : 0
 
-            width: parent.width - (leftIconWidth + rightIconWidth
-                                   + (slider.leftIcon.length > 0 ? Theme.spacingM : 0)
-                                   + (slider.rightIcon.length > 0 ? Theme.spacingM : 0))
+            width: parent.width - (leftIconWidth + rightIconWidth + (slider.leftIcon.length > 0 ? Theme.spacingM : 0) + (slider.rightIcon.length > 0 ? Theme.spacingM : 0))
             height: 6
             radius: 3
             color: slider.enabled ? Theme.surfaceVariantAlpha : Theme.surfaceLight
@@ -51,8 +59,7 @@ Item {
             StyledRect {
                 id: sliderFill
 
-                width: parent.width * ((slider.value - slider.minimum)
-                                       / (slider.maximum - slider.minimum))
+                width: (parent.width - sliderHandle.width) * ((slider.value - slider.minimum) / (slider.maximum - slider.minimum)) + sliderHandle.width
                 height: parent.height
                 radius: parent.radius
                 color: slider.enabled ? Theme.primary : Theme.surfaceVariantText
@@ -72,16 +79,11 @@ Item {
                 height: 18
                 radius: 9
                 color: slider.enabled ? Theme.primary : Theme.surfaceVariantText
-                border.color: slider.enabled ? Qt.lighter(Theme.primary,
-                                                          1.3) : Qt.lighter(
-                                                   Theme.surfaceVariantText,
-                                                   1.3)
+                border.color: slider.enabled ? Qt.lighter(Theme.primary, 1.3) : Qt.lighter(Theme.surfaceVariantText, 1.3)
                 border.width: 2
-                x: Math.max(0, Math.min(parent.width - width,
-                                        sliderFill.width - width / 2))
+                x: sliderFill.width - width
                 anchors.verticalCenter: parent.verticalCenter
-                scale: sliderMouseArea.containsMouse
-                       || sliderMouseArea.pressed ? 1.2 : 1
+                scale: sliderMouseArea.containsMouse || sliderMouseArea.pressed ? 1.2 : 1
 
                 StyledRect {
                     anchors.centerIn: parent
@@ -106,8 +108,7 @@ Item {
                     anchors.bottom: parent.top
                     anchors.bottomMargin: Theme.spacingS
                     anchors.horizontalCenter: parent.horizontalCenter
-                    visible: (sliderMouseArea.containsMouse && slider.showValue)
-                             || (slider.isDragging && slider.showValue)
+                    visible: (sliderMouseArea.containsMouse && slider.showValue) || (slider.isDragging && slider.showValue)
                     opacity: visible ? 1 : 0
 
                     StyledText {
@@ -151,20 +152,27 @@ Item {
                     anchors.topMargin: -10
                     anchors.bottomMargin: -10
                     hoverEnabled: true
-                    cursorShape: slider.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                     enabled: slider.enabled
                     preventStealing: true
+                    acceptedButtons: Qt.LeftButton
+                    onWheel: wheelEvent => {
+                                 if (!slider.wheelEnabled)
+                                 return
+                                 let step = Math.max(1, (maximum - minimum) / 20)
+                                 let newValue = wheelEvent.angleDelta.y > 0 ? Math.min(maximum, value + step) : Math.max(minimum, value - step)
+                                 newValue = Math.round(newValue)
+                                 if (newValue !== value) {
+                                     value = newValue
+                                     sliderValueChanged(newValue)
+                                 }
+                                 wheelEvent.accepted = true
+                             }
                     onPressed: mouse => {
                                    if (slider.enabled) {
                                        slider.isDragging = true
                                        sliderMouseArea.isDragging = true
-                                       let ratio = Math.max(
-                                           0, Math.min(1, mouse.x / width))
-                                       let newValue = Math.round(
-                                           slider.minimum + ratio
-                                           * (slider.maximum - slider.minimum))
-                                       slider.value = newValue
-                                       slider.sliderValueChanged(newValue)
+                                       updateValueFromPosition(mouse.x)
                                    }
                                }
                     onReleased: {
@@ -175,64 +183,15 @@ Item {
                         }
                     }
                     onPositionChanged: mouse => {
-                                           if (pressed && slider.isDragging
-                                               && slider.enabled) {
-                                               let ratio = Math.max(
-                                                   0, Math.min(1,
-                                                               mouse.x / width))
-                                               let newValue = Math.round(
-                                                   slider.minimum + ratio
-                                                   * (slider.maximum - slider.minimum))
-                                               slider.value = newValue
-                                               slider.sliderValueChanged(
-                                                   newValue)
+                                           if (pressed && slider.isDragging && slider.enabled) {
+                                               updateValueFromPosition(mouse.x)
                                            }
                                        }
                     onClicked: mouse => {
                                    if (slider.enabled && !slider.isDragging) {
-                                       let ratio = Math.max(
-                                           0, Math.min(1, mouse.x / width))
-                                       let newValue = Math.round(
-                                           slider.minimum + ratio
-                                           * (slider.maximum - slider.minimum))
-                                       slider.value = newValue
-                                       slider.sliderValueChanged(newValue)
+                                       updateValueFromPosition(mouse.x)
                                    }
                                }
-                }
-
-                MouseArea {
-                    id: sliderGlobalMouseArea
-
-                    anchors.fill: sliderContainer
-                    enabled: slider.isDragging
-                    visible: false
-                    preventStealing: true
-                    onPositionChanged: mouse => {
-                                           if (slider.isDragging
-                                               && slider.enabled) {
-                                               let globalPos = mapToItem(
-                                                   sliderTrack,
-                                                   mouse.x, mouse.y)
-                                               let ratio = Math.max(
-                                                   0, Math.min(
-                                                       1,
-                                                       globalPos.x / sliderTrack.width))
-                                               let newValue = Math.round(
-                                                   slider.minimum + ratio
-                                                   * (slider.maximum - slider.minimum))
-                                               slider.value = newValue
-                                               slider.sliderValueChanged(
-                                                   newValue)
-                                           }
-                                       }
-                    onReleased: {
-                        if (slider.isDragging && slider.enabled) {
-                            slider.isDragging = false
-                            sliderMouseArea.isDragging = false
-                            slider.sliderDragFinished(slider.value)
-                        }
-                    }
                 }
             }
         }

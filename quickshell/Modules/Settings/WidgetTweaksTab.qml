@@ -127,6 +127,7 @@ Item {
                                            SettingsData.osLogoBrightness * 100)
                                 unit: "%"
                                 showValue: true
+                                wheelEnabled: false
                                 onSliderValueChanged: newValue => {
                                                           SettingsData.setOSLogoBrightness(
                                                               newValue / 100)
@@ -154,6 +155,7 @@ Item {
                                            SettingsData.osLogoContrast * 100)
                                 unit: "%"
                                 showValue: true
+                                wheelEnabled: false
                                 onSliderValueChanged: newValue => {
                                                           SettingsData.setOSLogoContrast(
                                                               newValue / 100)
@@ -226,6 +228,119 @@ Item {
                         checked: SettingsData.showWorkspacePadding
                         onToggled: checked => {
                                        return SettingsData.setShowWorkspacePadding(
+                                           checked)
+                                   }
+                    }
+
+                    DankToggle {
+                        width: parent.width
+                        text: "Show Workspace Apps"
+                        description: "Display application icons in workspace indicators"
+                        checked: SettingsData.showWorkspaceApps
+                        onToggled: checked => {
+                                       return SettingsData.setShowWorkspaceApps(
+                                           checked)
+                                   }
+                    }
+
+		    Row {
+                        width: parent.width - Theme.spacingL
+                        spacing: Theme.spacingL
+                        visible: SettingsData.showWorkspaceApps
+                        opacity: visible ? 1 : 0
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingL
+
+                        Column {
+                            width: 120
+                            spacing: Theme.spacingS
+
+                            StyledText {
+                                text: "Max apps to show"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                font.weight: Font.Medium
+                            }
+
+                            DankTextField {
+                                width: 100
+                                height: 28
+                                placeholderText: "#ffffff"
+                                text: SettingsData.maxWorkspaceIcons
+                                maximumLength: 7
+                                font.pixelSize: Theme.fontSizeSmall
+                                topPadding: Theme.spacingXS
+                                bottomPadding: Theme.spacingXS
+                                onEditingFinished: {
+                                    SettingsData.setMaxWorkspaceIcons(parseInt(text, 10))
+                                }
+                            }
+                        }
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.mediumDuration
+                                easing.type: Theme.emphasizedEasing
+                            }
+                        }
+                    }
+
+                    DankToggle {
+                        width: parent.width
+                        text: "Per-Monitor Workspaces"
+                        description: "Show only workspaces belonging to each specific monitor."
+                        checked: SettingsData.workspacesPerMonitor
+                        onToggled: checked => {
+                            return SettingsData.setWorkspacesPerMonitor(checked);
+                        }
+                    }
+                }
+            }
+
+            StyledRect {
+                width: parent.width
+                height: runningAppsSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g,
+                               Theme.surfaceVariant.b, 0.3)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
+                                      Theme.outline.b, 0.2)
+                border.width: 1
+
+                Column {
+                    id: runningAppsSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "apps"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: "Running Apps Settings"
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        width: parent.width
+                        text: "Running Apps Only In Current Workspace"
+                        description: "Show only apps running in current workspace"
+                        checked: SettingsData.runningAppsCurrentWorkspace
+                        onToggled: checked => {
+                                       return SettingsData.setRunningAppsCurrentWorkspace(
                                            checked)
                                    }
                     }

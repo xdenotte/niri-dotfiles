@@ -15,6 +15,11 @@ Item {
         "description": "System bar with widgets and system information",
         "icon": "toolbar"
     }, {
+        "id": "dock",
+        "name": "Application Dock",
+        "description": "Bottom dock for pinned and running applications",
+        "icon": "dock"
+    }, {
         "id": "notifications",
         "name": "Notification Popups",
         "description": "Notification toast popups",
@@ -29,6 +34,21 @@ Item {
         "name": "On-Screen Displays",
         "description": "Volume, brightness, and other system OSDs",
         "icon": "picture_in_picture"
+    }, {
+        "id": "toast",
+        "name": "Toast Messages",
+        "description": "System toast notifications",
+        "icon": "campaign"
+    }, {
+        "id": "notepad",
+        "name": "Notepad Slideout",
+        "description": "Quick note-taking slideout panel",
+        "icon": "sticky_note_2"
+    }, {
+        "id": "systemTray",
+        "name": "System Tray",
+        "description": "System tray icons",
+        "icon": "notifications"
     }]
 
     function getScreenPreferences(componentId) {

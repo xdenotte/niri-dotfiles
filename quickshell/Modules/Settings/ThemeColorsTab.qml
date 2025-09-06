@@ -1,8 +1,10 @@
 import QtQuick
 import QtQuick.Controls
+import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Modals
+import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
 
@@ -624,6 +626,7 @@ Item {
                             maximum: 100
                             unit: ""
                             showValue: true
+                            wheelEnabled: false
                             onSliderValueChanged: newValue => {
                                                       SettingsData.setTopBarTransparency(
                                                           newValue / 100)
@@ -651,6 +654,7 @@ Item {
                             maximum: 100
                             unit: ""
                             showValue: true
+                            wheelEnabled: false
                             onSliderValueChanged: newValue => {
                                                       SettingsData.setTopBarWidgetTransparency(
                                                           newValue / 100)
@@ -678,6 +682,7 @@ Item {
                             maximum: 100
                             unit: ""
                             showValue: true
+                            wheelEnabled: false
                             onSliderValueChanged: newValue => {
                                                       SettingsData.setPopupTransparency(
                                                           newValue / 100)
@@ -754,7 +759,7 @@ Item {
                             width: parent.width - Theme.iconSize - Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
                             text: "Icon Theme"
-                            description: "DankShell & System Icons"
+                            description: "DankShell & System Icons\n(requires restart)"
                             currentValue: SettingsData.iconTheme
                             enableFuzzySearch: true
                             popupWidthOffset: 100
@@ -765,11 +770,11 @@ Item {
                             }
                             onValueChanged: value => {
                                                 SettingsData.setIconTheme(value)
-                                                if (value !== "System Default"
-                                                    && !SettingsData.qt5ctAvailable
-                                                    && !SettingsData.qt6ctAvailable)
-                                                ToastService.showWarning(
-                                                    "qt5ct or qt6ct not found - Qt app themes may not update without these tools")
+                                                if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" &&
+                                                    Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" &&
+                                                    Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
+                                                    ToastService.showError("Missing Environment Variables", "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.")
+                                                }
                                             }
                         }
                     }

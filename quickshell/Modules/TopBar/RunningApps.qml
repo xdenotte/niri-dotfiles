@@ -18,16 +18,22 @@ Rectangle {
     readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 2 : Theme.spacingS
     // The visual root for this window
     property Item windowRoot: (Window.window ? Window.window.contentItem : null)
-    readonly property var sortedToplevels: CompositorService.sortedToplevels
+    readonly property var sortedToplevels: {
+        if (SettingsData.runningAppsCurrentWorkspace) {
+            return CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, parentScreen.name);
+        }
+        return CompositorService.sortedToplevels;
+    }
     readonly property int windowCount: sortedToplevels.length
     readonly property int calculatedWidth: {
-        if (windowCount === 0)
-            return 0
+        if (windowCount === 0) {
+            return 0;
+        }
         if (SettingsData.runningAppsCompactMode) {
-            return windowCount * 24 + (windowCount - 1) * Theme.spacingXS + horizontalPadding * 2
+            return windowCount * 24 + (windowCount - 1) * Theme.spacingXS + horizontalPadding * 2;
         } else {
             return windowCount * (24 + Theme.spacingXS + 120)
-                    + (windowCount - 1) * Theme.spacingXS + horizontalPadding * 2
+                    + (windowCount - 1) * Theme.spacingXS + horizontalPadding * 2;
         }
     }
 
@@ -37,13 +43,104 @@ Rectangle {
     visible: windowCount > 0
     clip: false
     color: {
-        if (windowCount === 0)
-            return "transparent"
+        if (windowCount === 0) {
+            return "transparent";
+        }
         
-        if (SettingsData.topBarNoBackground) return "transparent"
-        const baseColor = Theme.secondaryHover
+        if (SettingsData.topBarNoBackground) {
+            return "transparent";
+        }
+        const baseColor = Theme.secondaryHover;
         return Qt.rgba(baseColor.r, baseColor.g, baseColor.b,
-                       baseColor.a * Theme.widgetTransparency)
+                       baseColor.a * Theme.widgetTransparency);
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        acceptedButtons: Qt.NoButton
+        
+        property real scrollAccumulator: 0
+        property real touchpadThreshold: 500
+        
+        onWheel: (wheel) => {
+            const deltaY = wheel.angleDelta.y;
+            const isMouseWheel = Math.abs(deltaY) >= 120
+                && (Math.abs(deltaY) % 120) === 0;
+            
+            const windows = root.sortedToplevels;
+            if (windows.length < 2) {
+                return;
+            }
+            
+            if (isMouseWheel) {
+                // Direct mouse wheel action
+                let currentIndex = -1;
+                for (let i = 0; i < windows.length; i++) {
+                    if (windows[i].activated) {
+                        currentIndex = i;
+                        break;
+                    }
+                }
+
+                let nextIndex;
+                if (deltaY < 0) {
+                    if (currentIndex === -1) {
+                        nextIndex = 0;
+                    } else {
+                        nextIndex = (currentIndex + 1) % windows.length;
+                    }
+                } else {
+                    if (currentIndex === -1) {
+                        nextIndex = windows.length - 1;
+                    } else {
+                        nextIndex = (currentIndex - 1 + windows.length) % windows.length;
+                    }
+                }
+
+                const nextWindow = windows[nextIndex];
+                if (nextWindow) {
+                    nextWindow.activate();
+                }
+            } else {
+                // Touchpad - accumulate small deltas
+                scrollAccumulator += deltaY;
+                
+                if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
+                    let currentIndex = -1;
+                    for (let i = 0; i < windows.length; i++) {
+                        if (windows[i].activated) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+
+                    let nextIndex;
+                    if (scrollAccumulator < 0) {
+                        if (currentIndex === -1) {
+                            nextIndex = 0;
+                        } else {
+                            nextIndex = (currentIndex + 1) % windows.length;
+                        }
+                    } else {
+                        if (currentIndex === -1) {
+                            nextIndex = windows.length - 1;
+                        } else {
+                            nextIndex = (currentIndex - 1 + windows.length) % windows.length;
+                        }
+                    }
+
+                    const nextWindow = windows[nextIndex];
+                    if (nextWindow) {
+                        nextWindow.activate();
+                    }
+                    
+                    scrollAccumulator = 0;
+                }
+            }
+            
+            wheel.accepted = true;
+        }
     }
 
     Row {
@@ -65,11 +162,11 @@ Rectangle {
                 property string windowTitle: modelData.title || "(Unnamed)"
                 property var toplevelObject: modelData
                 property string tooltipText: {
-                    var appName = "Unknown"
+                    let appName = "Unknown";
                     if (appId) {
-                        var desktopEntry = DesktopEntries.byId(appId)
+                        const desktopEntry = DesktopEntries.heuristicLookup(appId);
                         appName = desktopEntry
-                                && desktopEntry.name ? desktopEntry.name : appId
+                                && desktopEntry.name ? desktopEntry.name : appId;
                     }
                     return appName + (windowTitle ? " • " + windowTitle : "")
                 }
@@ -81,7 +178,7 @@ Rectangle {
                     anchors.fill: parent
                     radius: Theme.cornerRadius
                     color: {
-                        if (isFocused)
+                        if (isFocused) {
                             return mouseArea.containsMouse ? Qt.rgba(
                                                                  Theme.primary.r,
                                                                  Theme.primary.g,
@@ -90,13 +187,14 @@ Rectangle {
                                                                  Theme.primary.r,
                                                                  Theme.primary.g,
                                                                  Theme.primary.b,
-                                                                 0.2)
-                        else
+                                                                 0.2);
+                        } else {
                             return mouseArea.containsMouse ? Qt.rgba(
                                                                  Theme.primaryHover.r,
                                                                  Theme.primaryHover.g,
                                                                  Theme.primaryHover.b,
-                                                                 0.1) : "transparent"
+                                                                 0.1) : "transparent";
+                        }
                     }
 
                     Behavior on color {
@@ -110,26 +208,12 @@ Rectangle {
                 // App icon
                 IconImage {
                     id: iconImg
-
                     anchors.left: parent.left
                     anchors.leftMargin: SettingsData.runningAppsCompactMode ? (parent.width - 18) / 2 : Theme.spacingXS
                     anchors.verticalCenter: parent.verticalCenter
                     width: 18
                     height: 18
-                    source: {
-                        if (!appId)
-                            return ""
-
-                        var desktopEntry = DesktopEntries.byId(appId)
-                        if (desktopEntry && desktopEntry.icon) {
-                            var iconPath = Quickshell.iconPath(
-                                        desktopEntry.icon,
-                                        SettingsData.iconTheme
-                                        === "System Default" ? "" : SettingsData.iconTheme)
-                            return iconPath
-                        }
-                        return ""
-                    }
+                    source: Quickshell.iconPath(DesktopEntries.heuristicLookup(Paths.moddedAppId(appId))?.icon, true)
                     smooth: true
                     mipmap: true
                     asynchronous: true
@@ -138,19 +222,19 @@ Rectangle {
 
                 // Fallback text if no icon found
                 Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: SettingsData.runningAppsCompactMode ? (parent.width - 18) / 2 : Theme.spacingXS
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.centerIn: parent
                     visible: !iconImg.visible
                     text: {
-                        if (!appId)
-                            return "?"
+                        if (!appId) {
+                            return "?";
+                        }
 
-                        var desktopEntry = DesktopEntries.byId(appId)
-                        if (desktopEntry && desktopEntry.name)
-                            return desktopEntry.name.charAt(0).toUpperCase()
+                        const desktopEntry = DesktopEntries.heuristicLookup(appId);
+                        if (desktopEntry && desktopEntry.name) {
+                            return desktopEntry.name.charAt(0).toUpperCase();
+                        }
 
-                        return appId.charAt(0).toUpperCase()
+                        return appId.charAt(0).toUpperCase();
                     }
                     font.pixelSize: 10
                     color: Theme.surfaceText
@@ -179,31 +263,51 @@ Rectangle {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (toplevelObject) {
-                            toplevelObject.activate()
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    onClicked: (mouse) => {
+                        if (mouse.button === Qt.LeftButton) {
+                            if (toplevelObject) {
+                                toplevelObject.activate();
+                            }
+                        } else if (mouse.button === Qt.RightButton) {
+                            if (tooltipLoader.item) {
+                                tooltipLoader.item.hideTooltip();
+                            }
+                            tooltipLoader.active = false;
+                            
+                            windowContextMenuLoader.active = true;
+                            if (windowContextMenuLoader.item) {
+                                windowContextMenuLoader.item.currentWindow = toplevelObject;
+                                const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, 0);
+                                const screenX = root.parentScreen ? root.parentScreen.x : 0;
+                                const screenY = root.parentScreen ? root.parentScreen.y : 0;
+                                const relativeX = globalPos.x - screenX;
+                                const yPos = Theme.barHeight + SettingsData.topBarSpacing - 7;
+                                windowContextMenuLoader.item.showAt(relativeX, yPos);
+                            }
                         }
                     }
                     onEntered: {
-                        root.hoveredItem = delegateItem
-                        var globalPos = delegateItem.mapToGlobal(
-                                    delegateItem.width / 2, delegateItem.height)
-                        tooltipLoader.active = true
+                        root.hoveredItem = delegateItem;
+                        const globalPos = delegateItem.mapToGlobal(
+                                    delegateItem.width / 2, delegateItem.height);
+                        tooltipLoader.active = true;
                         if (tooltipLoader.item) {
-                            var tooltipY = Theme.barHeight
-                                    + SettingsData.topBarSpacing + Theme.spacingXS
+                            const tooltipY = Theme.barHeight
+                                    + SettingsData.topBarSpacing + Theme.spacingXS;
                             tooltipLoader.item.showTooltip(
                                         delegateItem.tooltipText, globalPos.x,
-                                        tooltipY, root.parentScreen)
+                                        tooltipY, root.parentScreen);
                         }
                     }
                     onExited: {
                         if (root.hoveredItem === delegateItem) {
-                            root.hoveredItem = null
-                            if (tooltipLoader.item)
-                                tooltipLoader.item.hideTooltip()
+                            root.hoveredItem = null;
+                            if (tooltipLoader.item) {
+                                tooltipLoader.item.hideTooltip();
+                            }
 
-                            tooltipLoader.active = false
+                            tooltipLoader.active = false;
                         }
                     }
                 }
@@ -217,5 +321,94 @@ Rectangle {
         active: false
 
         sourceComponent: RunningAppsTooltip {}
+    }
+    
+    Loader {
+        id: windowContextMenuLoader
+        active: false
+        sourceComponent: PanelWindow {
+            id: contextMenuWindow
+            
+            property var currentWindow: null
+            property bool isVisible: false
+            property point anchorPos: Qt.point(0, 0)
+            
+            function showAt(x, y) {
+                screen = root.parentScreen;
+                anchorPos = Qt.point(x, y);
+                isVisible = true;
+                visible = true;
+            }
+            
+            function close() {
+                isVisible = false;
+                visible = false;
+                windowContextMenuLoader.active = false;
+            }
+            
+            implicitWidth: 100
+            implicitHeight: 40
+            visible: false
+            color: "transparent"
+            
+            WlrLayershell.layer: WlrLayershell.Overlay
+            WlrLayershell.exclusiveZone: -1
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            
+            anchors {
+                top: true
+                left: true
+                right: true
+                bottom: true
+            }
+            
+            MouseArea {
+                anchors.fill: parent
+                onClicked: contextMenuWindow.close();
+            }
+            
+            Rectangle {
+                x: {
+                    const left = 10;
+                    const right = contextMenuWindow.width - width - 10;
+                    const want = contextMenuWindow.anchorPos.x - width / 2;
+                    return Math.max(left, Math.min(right, want));
+                }
+                y: contextMenuWindow.anchorPos.y
+                width: 100
+                height: 32
+                color: Theme.popupBackground()
+                radius: Theme.cornerRadius
+                border.width: 1
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                
+                Rectangle {
+                    anchors.fill: parent
+                    radius: parent.radius
+                    color: closeMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                }
+                
+                StyledText {
+                    anchors.centerIn: parent
+                    text: "Close"
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
+                    font.weight: Font.Normal
+                }
+                
+                MouseArea {
+                    id: closeMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (contextMenuWindow.currentWindow) {
+                            contextMenuWindow.currentWindow.close();
+                        }
+                        contextMenuWindow.close();
+                    }
+                }
+            }
+        }
     }
 }

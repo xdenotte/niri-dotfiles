@@ -64,8 +64,7 @@ quickshell -p shell.qml
 qs -p .
 
 # Code formatting and linting
-./qmlformat-all.sh       # Format all QML files using project script
-qmlformat -i **/*.qml    # Format all QML files in place
+qmlfmt -t 4 -i 4 -b 250 -w /path/to/file.qml    # Format a QML file (requires qmlfmt, do not use qmlformat)
 qmllint **/*.qml         # Lint all QML files for syntax errors
 ```
 
@@ -87,7 +86,7 @@ shell.qml           # Main entry point (minimal orchestration)
 │   ├── AudioService.qml
 │   ├── NetworkService.qml
 │   ├── BluetoothService.qml
-│   ├── BrightnessService.qml
+│   ├── DisplayService.qml
 │   ├── NotificationService.qml
 │   ├── WeatherService.qml
 │   └── [14 more services]
@@ -131,7 +130,7 @@ shell.qml           # Main entry point (minimal orchestration)
 3. **Services/** - System integration singletons
    - **Pattern**: All services use `Singleton` type with `id: root`
    - **Independence**: No cross-service dependencies
-   - **Examples**: AudioService, NetworkService, BluetoothService, BrightnessService, WeatherService, NotificationService, CalendarService, BatteryService, NiriService, MprisController
+   - **Examples**: AudioService, NetworkService, BluetoothService, DisplayService, WeatherService, NotificationService, CalendarService, BatteryService, NiriService, MprisController
    - Services handle system commands, state management, and hardware integration
 
 4. **Modules/** - UI components (93 files)
@@ -221,6 +220,8 @@ shell.qml           # Main entry point (minimal orchestration)
    - Properties before signal handlers before child components
    - Prefer property bindings over imperative code
    - **CRITICAL**: NEVER add comments unless absolutely essential for complex logic understanding. Code should be self-documenting through clear naming and structure. Comments are a code smell indicating unclear implementation.
+   - Use guard statements, example `if (abc) { something() return;} somethingElse();`
+   - Don't use crazy ternary stuff, but use it for simple if else only. `propertyVal: a ? b : c`
 
 2. **Naming Conventions**:
    - **Services**: Use `Singleton` type with `id: root`
@@ -228,9 +229,7 @@ shell.qml           # Main entry point (minimal orchestration)
    - **Properties**: camelCase for properties, PascalCase for types
 
 3. **Null-Safe Operations**:
-   - **Do NOT use** `?.` operator (not supported by qmlformat)
-   - **Use** `object && object.property` instead of `object?.property`
-   - **Example**: `activePlayer && activePlayer.trackTitle` instead of `activePlayer?.trackTitle`
+   - **Use** `object?.property`
 
 4. **Component Structure**:
    ```qml
@@ -294,9 +293,9 @@ shell.qml           # Main entry point (minimal orchestration)
    
    // In modules - adapt UI accordingly
    DankSlider {
-       visible: BrightnessService.brightnessAvailable
-       enabled: BrightnessService.brightnessAvailable
-       value: BrightnessService.brightnessLevel
+       visible: DisplayService.brightnessAvailable
+       enabled: DisplayService.brightnessAvailable
+       value: DisplayService.brightnessLevel
    }
    ```
 

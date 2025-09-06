@@ -119,10 +119,33 @@ Night mode (gamma/color temperature) control.
   - `value` - Optional temperature in Kelvin (2500-6000, steps of 500)
 - Returns: Current or newly set temperature
 
+**`automation [mode]`**
+- Get or set night mode automation mode
+- Parameters:
+  - `mode` - Optional automation mode: "manual", "time", or "location"
+- Returns: Current or newly set automation mode
+
+**`schedule <start> <end>`**
+- Set time-based automation schedule
+- Parameters:
+  - `start` - Start time in HH:MM format (e.g., "20:00")
+  - `end` - End time in HH:MM format (e.g., "06:00")
+- Returns: Confirmation of schedule update
+
+**`location <latitude> <longitude>`**
+- Set manual coordinates for location-based automation
+- Parameters:
+  - `latitude` - Latitude coordinate (e.g., 40.7128)
+  - `longitude` - Longitude coordinate (e.g., -74.0060)
+- Returns: Confirmation of coordinates update
+
 ### Examples
 ```bash
 qs -c dms ipc call night toggle
 qs -c dms ipc call night temperature 4000
+qs -c dms ipc call night automation time
+qs -c dms ipc call night schedule 20:00 06:00
+qs -c dms ipc call night location 40.7128 -74.0060
 ```
 
 ## Target: `mpris`
@@ -215,23 +238,90 @@ qs -c dms ipc call inhibit enable
 
 ## Target: `wallpaper`
 
-Wallpaper management and retrieval.
+Wallpaper management and retrieval with support for per-monitor configurations.
 
-### Functions
+### Legacy Functions (Global Wallpaper Mode)
 
 **`get`**
 - Get current wallpaper path
-- Returns: Full path to current wallpaper file
+- Returns: Full path to current wallpaper file, or error if per-monitor mode is enabled
 
 **`set <path>`**
 - Set wallpaper to specified path
 - Parameters: `path` - Absolute or relative path to image file
-- Returns: Confirmation message or error
+- Returns: Confirmation message or error if per-monitor mode is enabled
+
+**`clear`**
+- Clear all wallpapers and disable per-monitor mode
+- Returns: Success confirmation
+
+**`next`**
+- Cycle to next wallpaper in the same directory
+- Returns: Success confirmation or error if per-monitor mode is enabled
+
+**`prev`**
+- Cycle to previous wallpaper in the same directory
+- Returns: Success confirmation or error if per-monitor mode is enabled
+
+### Per-Monitor Functions
+
+**`getFor <screenName>`**
+- Get wallpaper path for specific monitor
+- Parameters: `screenName` - Monitor name (e.g., "DP-2", "eDP-1")
+- Returns: Full path to wallpaper file for the specified monitor
+
+**`setFor <screenName> <path>`**
+- Set wallpaper for specific monitor (automatically enables per-monitor mode)
+- Parameters: 
+  - `screenName` - Monitor name (e.g., "DP-2", "eDP-1")
+  - `path` - Absolute or relative path to image file
+- Returns: Success confirmation with monitor and path info
+
+**`nextFor <screenName>`**
+- Cycle to next wallpaper for specific monitor
+- Parameters: `screenName` - Monitor name (e.g., "DP-2", "eDP-1")
+- Returns: Success confirmation
+
+**`prevFor <screenName>`**
+- Cycle to previous wallpaper for specific monitor
+- Parameters: `screenName` - Monitor name (e.g., "DP-2", "eDP-1")
+- Returns: Success confirmation
 
 ### Examples
+
+**Global wallpaper mode:**
 ```bash
 qs -c dms ipc call wallpaper get
 qs -c dms ipc call wallpaper set /path/to/image.jpg
+qs -c dms ipc call wallpaper next
+qs -c dms ipc call wallpaper clear
+```
+
+**Per-monitor wallpaper mode:**
+```bash
+# Set different wallpapers for each monitor
+qs -c dms ipc call wallpaper setFor DP-2 /path/to/image1.jpg
+qs -c dms ipc call wallpaper setFor eDP-1 /path/to/image2.jpg
+
+# Get wallpaper for specific monitor
+qs -c dms ipc call wallpaper getFor DP-2
+
+# Cycle wallpapers for specific monitor
+qs -c dms ipc call wallpaper nextFor eDP-1
+qs -c dms ipc call wallpaper prevFor DP-2
+
+# Clear all wallpapers and return to global mode
+qs -c dms ipc call wallpaper clear
+```
+
+**Error handling:**
+When per-monitor mode is enabled, legacy functions will return helpful error messages:
+```bash
+qs -c dms ipc call wallpaper get
+# Returns: "ERROR: Per-monitor mode enabled. Use getFor(screenName) instead."
+
+qs -c dms ipc call wallpaper set /path/to/image.jpg
+# Returns: "ERROR: Per-monitor mode enabled. Use setFor(screenName, path) instead."
 ```
 
 ## Target: `profile`
@@ -278,6 +368,10 @@ Theme mode control (light/dark mode switching).
 - Switch to dark theme mode  
 - Returns: "dark"
 
+**`getMode`**
+- Returns current mode
+- Returns: "dark" or "light"
+
 ### Examples
 ```bash
 qs -c dms ipc call theme toggle
@@ -290,7 +384,7 @@ Top bar visibility control.
 
 ### Functions
 
-**`show`**
+**`reveal`**
 - Show the top bar
 - Returns: Success confirmation
 
@@ -357,6 +451,32 @@ System process list and performance modal control.
 - `close` - Hide process list modal
 - `toggle` - Toggle process list modal visibility
 
+### Target: `powermenu`
+Power menu modal control for system power actions.
+
+**Functions:**
+- `open` - Show power menu modal
+- `close` - Hide power menu modal
+- `toggle` - Toggle power menu modal visibility
+
+### Target: `notepad`
+Notepad/scratchpad modal control for quick note-taking.
+
+**Functions:**
+- `open` - Show notepad modal
+- `close` - Hide notepad modal
+- `toggle` - Toggle notepad modal visibility
+
+### Target: `file`
+File browser controls for selecting wallpapers and profile images.
+
+**Functions:**
+- `browse <type>` - Open file browser for specific file type
+  - Parameters: `type` - Either "wallpaper" or "profile"
+  - `wallpaper` - Opens wallpaper file browser in Pictures directory
+  - `profile` - Opens profile image file browser in Pictures directory
+  - Both browsers support common image formats (jpg, jpeg, png, bmp, gif, webp)
+
 ### Modal Examples
 ```bash
 # Open application launcher
@@ -373,6 +493,16 @@ qs -c dms ipc call settings open
 
 # Show system monitor
 qs -c dms ipc call processlist toggle
+
+# Show power menu
+qs -c dms ipc call powermenu toggle
+
+# Open notepad
+qs -c dms ipc call notepad toggle
+
+# Open file browsers
+qs -c dms ipc call file browse wallpaper
+qs -c dms ipc call file browse profile
 ```
 
 ## Common Usage Patterns
@@ -385,6 +515,8 @@ These IPC commands are designed to be used with window manager keybindings. Exam
 binds {
     Mod+Space { spawn "qs" "-c" "dms" "ipc" "call" "spotlight" "toggle"; }
     Mod+V { spawn "qs" "-c" "dms" "ipc" "call" "clipboard" "toggle"; }
+    Mod+P { spawn "qs" "-c" "dms" "ipc" "call" "notepad" "toggle"; }
+    Mod+X { spawn "qs" "-c" "dms" "ipc" "call" "powermenu" "toggle"; }
     XF86AudioRaiseVolume { spawn "qs" "-c" "dms" "ipc" "call" "audio" "increment" "3"; }
     XF86MonBrightnessUp { spawn "qs" "-c" "dms" "ipc" "call" "brightness" "increment" "5" ""; }
 }

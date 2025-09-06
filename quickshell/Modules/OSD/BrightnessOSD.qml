@@ -15,18 +15,17 @@ DankOSD {
         property int pendingValue: 0
 
         interval: {
-            const deviceInfo = BrightnessService.getCurrentDeviceInfo()
+            const deviceInfo = DisplayService.getCurrentDeviceInfo()
             return (deviceInfo && deviceInfo.class === "ddc") ? 200 : 50
         }
         repeat: false
         onTriggered: {
-            BrightnessService.setBrightnessInternal(pendingValue, BrightnessService.lastIpcDevice)
+            DisplayService.setBrightnessInternal(pendingValue, DisplayService.lastIpcDevice)
         }
     }
 
-
     Connections {
-        target: BrightnessService
+        target: DisplayService
         function onBrightnessChanged() {
             root.show()
         }
@@ -53,13 +52,14 @@ DankOSD {
                 DankIcon {
                     anchors.centerIn: parent
                     name: {
-                        const deviceInfo = BrightnessService.getCurrentDeviceInfo()
-                        if (!deviceInfo || deviceInfo.class === "backlight" || deviceInfo.class === "ddc")
+                        const deviceInfo = DisplayService.getCurrentDeviceInfo()
+                        if (!deviceInfo || deviceInfo.class === "backlight" || deviceInfo.class === "ddc") {
                             return "brightness_medium"
-                        else if (deviceInfo.name.includes("kbd"))
+                        } else if (deviceInfo.name.includes("kbd")) {
                             return "keyboard"
-                        else
+                        } else {
                             return "lightbulb"
+                        }
                     }
                     size: Theme.iconSize
                     color: Theme.primary
@@ -75,45 +75,48 @@ DankOSD {
                 anchors.verticalCenter: parent.verticalCenter
                 minimum: 1
                 maximum: 100
-                enabled: BrightnessService.brightnessAvailable
+                enabled: DisplayService.brightnessAvailable
                 showValue: true
                 unit: "%"
 
                 Component.onCompleted: {
-                    if (BrightnessService.brightnessAvailable)
-                        value = BrightnessService.brightnessLevel
-                }
-
-                onSliderValueChanged: function(newValue) {
-                    if (BrightnessService.brightnessAvailable) {
-                        root.brightnessDebounceTimer.pendingValue = newValue
-                        root.brightnessDebounceTimer.restart()
-                        resetHideTimer()
+                    if (DisplayService.brightnessAvailable) {
+                        value = DisplayService.brightnessLevel
                     }
                 }
+
+                onSliderValueChanged: newValue => {
+                                          if (DisplayService.brightnessAvailable) {
+                                              root.brightnessDebounceTimer.pendingValue = newValue
+                                              root.brightnessDebounceTimer.restart()
+                                              resetHideTimer()
+                                          }
+                                      }
 
                 onContainsMouseChanged: {
                     setChildHovered(containsMouse)
                 }
 
-                onSliderDragFinished: function(finalValue) {
-                    if (BrightnessService.brightnessAvailable) {
-                        root.brightnessDebounceTimer.stop()
-                        BrightnessService.setBrightnessInternal(finalValue, BrightnessService.lastIpcDevice)
-                    }
-                }
+                onSliderDragFinished: finalValue => {
+                                          if (DisplayService.brightnessAvailable) {
+                                              root.brightnessDebounceTimer.stop()
+                                              DisplayService.setBrightnessInternal(finalValue, DisplayService.lastIpcDevice)
+                                          }
+                                      }
 
                 Connections {
-                    target: BrightnessService
+                    target: DisplayService
 
                     function onBrightnessChanged() {
-                        if (!brightnessSlider.pressed)
-                            brightnessSlider.value = BrightnessService.brightnessLevel
+                        if (!brightnessSlider.pressed) {
+                            brightnessSlider.value = DisplayService.brightnessLevel
+                        }
                     }
 
                     function onDeviceSwitched() {
-                        if (!brightnessSlider.pressed)
-                            brightnessSlider.value = BrightnessService.brightnessLevel
+                        if (!brightnessSlider.pressed) {
+                            brightnessSlider.value = DisplayService.brightnessLevel
+                        }
                     }
                 }
             }
@@ -121,10 +124,11 @@ DankOSD {
     }
 
     onOsdShown: {
-        if (BrightnessService.brightnessAvailable && contentLoader.item) {
-            let slider = contentLoader.item.children[0].children[1]
-            if (slider)
-                slider.value = BrightnessService.brightnessLevel
+        if (DisplayService.brightnessAvailable && contentLoader.item) {
+            const slider = contentLoader.item.children[0].children[1]
+            if (slider) {
+                slider.value = DisplayService.brightnessLevel
+            }
         }
     }
 }
