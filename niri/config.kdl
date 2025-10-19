@@ -34,7 +34,7 @@ cursor {
 
 // --- Output Configuration ---
 output "eDP-1" {
-    mode "1920x1080@144"
+    mode "1920x1080"
     scale 1.25
     transform "normal"
 }
@@ -61,7 +61,7 @@ layout {
 
     border {
         width 2
-        active-color "#ffb4a9"
+        active-color "#f3bd6e"
         inactive-color "#505050"
     }
 
@@ -77,7 +77,7 @@ layout {
     shadow {
         on
         draw-behind-window false
-        color "#ffb4a9"
+        color "#f3bd6e"
         inactive-color "#505050"
     }
 }
@@ -85,8 +85,7 @@ layout {
 // --- Startup Applications ---
 spawn-at-startup "bash" "-c" "wl-paste --watch cliphist store &"
 spawn-at-startup "mate-polkit"
-spawn-at-startup "quickshell"
-spawn-at-startup "hypridle"
+spawn-at-startup "dms" "run"
 spawn-at-startup "steam"
 spawn-at-startup "vesktop"
 
@@ -101,6 +100,7 @@ environment {
     MOZ_ENABLE_WAYLAND "1"
     TERMINAL "kitty"
     TERM "kitty"
+    DMS_DISABLE_LAYER "true"
 }
 
 hotkey-overlay {
@@ -171,19 +171,19 @@ binds {
 
     // Launchers & Utilities
     Mod+Return { spawn "kitty"; }
-    Mod+D { spawn "qs" "ipc" "call" "spotlight" "toggle"; }
+    Mod+D { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
     Mod+M { spawn "pavucontrol"; }
     MOD+Shift+B { spawn "chromium"; }
-    Mod+Shift+Q { spawn "qs" "ipc" "call" "powermenu" "toggle"; }
-    Mod+P {spawn "qs" "ipc" "call" "notepad" "toggle"; }
+    Mod+Shift+Q { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
+    Mod+P {spawn "dms" "ipc" "call" "notepad" "toggle"; }
     Mod+A { spawn "nemo"; }
-    Super+L { spawn "qs" "ipc" "call" "lock" "lock"; }
+    Super+L { spawn "dms" "ipc" "call" "lock" "lock"; }
     Mod+K { spawn "kate" "/home/xdenotte/.config/niri/config.kdl"; }
 
     // Volume Control
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "qs" "ipc" "call" "audio" "increment" "3"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "qs" "ipc" "call" "audio" "decrement" "3"; }
-    XF86AudioMute        allow-when-locked=true { spawn "qs" "ipc" "call" "audio" "mute"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "increment" "3"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "decrement" "3"; }
+    XF86AudioMute        allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "mute"; }
     XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
     Mod+Q { close-window; }
@@ -311,8 +311,8 @@ binds {
     Mod+Shift+P { power-off-monitors; }
 
     // Brightness Control
-    XF86MonBrightnessUp allow-when-locked=true { spawn "qs" "ipc" "call" "brightness" "increment" "5" ""; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "qs" "ipc" "call" "brightness" "decrement" "5" ""; }
+    XF86MonBrightnessUp allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5" ""; }
 }
 
 // --- Layer Rules ---
