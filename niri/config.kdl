@@ -1,5 +1,7 @@
-// My Niri Config
-// https://github.com/YaLTeR/niri/wiki/Configuration:-Overview
+include "dms/colors.kdl"
+include "dms/wpblur.kdl"
+include "dms/layout.kdl"
+
 
 // --- Input Devices ---
 input {
@@ -39,53 +41,9 @@ output "eDP-1" {
     transform "normal"
 }
 
-// --- Layout Settings ---
-layout {
-    gaps 12
-    center-focused-column "never"
-
-    preset-column-widths {
-        proportion 0.33333
-        proportion 0.5
-        proportion 0.66667
-    }
-
-    default-column-width { proportion 0.5; }
-
-    focus-ring {
-        off
-        width 4
-        active-color "#90d5ad"
-        inactive-color "#505050"
-    }
-
-    border {
-        width 2
-        active-color "#f3bd6e"
-        inactive-color "#505050"
-    }
-
-    background-color "transparent"
-
-    struts {
-        // left 64
-        // right 64
-        // top 64
-        // bottom 64
-    }
-
-    shadow {
-        on
-        draw-behind-window false
-        color "#f3bd6e"
-        inactive-color "#505050"
-    }
-}
-
 // --- Startup Applications ---
-spawn-at-startup "bash" "-c" "wl-paste --watch cliphist store &"
-spawn-at-startup "mate-polkit"
-spawn-at-startup "dms" "run"
+spawn-sh-at-startup "bash -c wl-paste --watch cliphist store &"
+spawn-sh-at-startup "dms run"
 spawn-at-startup "steam"
 spawn-at-startup "vesktop"
 
@@ -100,7 +58,6 @@ environment {
     MOZ_ENABLE_WAYLAND "1"
     TERMINAL "kitty"
     TERM "kitty"
-    DMS_DISABLE_LAYER "true"
 }
 
 hotkey-overlay {
@@ -109,6 +66,10 @@ hotkey-overlay {
 
 // Uncomment to prefer no client-side decorations
 prefer-no-csd
+
+config-notification {
+    disable-failed
+}
 
 screenshot-path "/home/xdenotte/Изображения/Screenshot from %Y-%m-%d %H-%M-%S.png"
 // screenshot-path null
@@ -313,10 +274,4 @@ binds {
     // Brightness Control
     XF86MonBrightnessUp allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5" ""; }
-}
-
-// --- Layer Rules ---
-layer-rule {
-    match namespace="^quickshell$"
-    place-within-backdrop true
 }
