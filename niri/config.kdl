@@ -25,9 +25,8 @@ input {
 
     // Uncomment to warp mouse to center of new windows
     // warp-mouse-to-focus
-
     // Uncomment to focus windows/outputs on mouse hover
-    // focus-follows-mouse max-scroll-amount="0%"
+    focus-follows-mouse max-scroll-amount="0%"
 }
 
 cursor {
@@ -45,7 +44,7 @@ output "eDP-1" {
 spawn-sh-at-startup "bash -c wl-paste --watch cliphist store &"
 spawn-sh-at-startup "dms run"
 spawn-at-startup "steam"
-spawn-at-startup "vesktop"
+spawn-at-startup "discord"
 
 // --- Environment Variables ---
 environment {
@@ -62,6 +61,10 @@ environment {
 
 hotkey-overlay {
     skip-at-startup
+}
+
+clipboard {
+    disable-primary
 }
 
 // Uncomment to prefer no client-side decorations
@@ -131,13 +134,13 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // Launchers & Utilities
-    Mod+Return { spawn "kitty"; }
+    Mod+Return { spawn "foot"; }
     Mod+D { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
     Mod+M { spawn "pavucontrol"; }
-    MOD+Shift+B { spawn "chromium"; }
+    MOD+Shift+B { spawn "firefox"; }
     Mod+Shift+Q { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
     Mod+P {spawn "dms" "ipc" "call" "notepad" "toggle"; }
-    Mod+A { spawn "nemo"; }
+    Mod+A { spawn "nautilus"; }
     Super+L { spawn "dms" "ipc" "call" "lock" "lock"; }
     Mod+K { spawn "kate" "/home/xdenotte/.config/niri/config.kdl"; }
 
@@ -274,4 +277,8 @@ binds {
     // Brightness Control
     XF86MonBrightnessUp allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5" ""; }
+}
+
+debug {
+    emulate-zero-presentation-time
 }
