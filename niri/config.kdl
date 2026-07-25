@@ -1,6 +1,4 @@
-include "dms/colors.kdl"
-include "dms/wpblur.kdl"
-include "dms/layout.kdl"
+include "noctalia.kdl"
 
 
 // --- Input Devices ---
@@ -40,11 +38,18 @@ output "eDP-1" {
     transform "normal"
 }
 
+layout {
+    gaps 5
+
+focus-ring {
+    width 2
+    }
+}
+
 // --- Startup Applications ---
-spawn-sh-at-startup "bash -c wl-paste --watch cliphist store &"
-spawn-sh-at-startup "dms run"
+spawn-at-startup "noctalia"
 spawn-at-startup "steam"
-spawn-at-startup "discord"
+spawn-at-startup "equibop"
 
 // --- Environment Variables ---
 environment {
@@ -55,8 +60,8 @@ environment {
     QT_QPA_PLATFORMTHEME "qt6ct"
     XDG_SESSION_TYPE "wayland"
     MOZ_ENABLE_WAYLAND "1"
-    TERMINAL "kitty"
-    TERM "kitty"
+    TERMINAL "foot"
+    TERM "foot"
 }
 
 hotkey-overlay {
@@ -120,6 +125,41 @@ window-rule {
     clip-to-geometry true
 }
 
+window-rule {
+    match app-id="kate"
+    opacity 0.9
+    background-effect {
+        blur true
+    }
+}
+
+window-rule {
+    match app-id="Loupe"
+    opacity 0.9
+    background-effect {
+            blur true
+    }
+
+    popups {
+        geometry-corner-radius 15
+        background-effect {
+            blur true
+        }
+    }
+}
+
+layer-rule {
+  match namespace="^noctalia-backdrop"
+  place-within-backdrop true
+}
+
+layer-rule {
+  match namespace="^noctalia-(bar-[^\"]+|notification|dock|panel|attached-panel|osd)$"
+  background-effect {
+    xray false
+    // blur false
+  }
+}
 
 // Example: Block screen capture for password managers
 // /-window-rule {
@@ -131,26 +171,24 @@ window-rule {
 
 // --- Keybinds ---
 binds {
-    Mod+Shift+Slash { show-hotkey-overlay; }
-
-    // Launchers & Utilities
+    Mod+Q { close-window; }
     Mod+Return { spawn "foot"; }
-    Mod+D { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
+    Mod+D { spawn-sh "noctalia msg panel-toggle launcher"; }
     Mod+M { spawn "pavucontrol"; }
-    MOD+Shift+B { spawn "firefox"; }
-    Mod+Shift+Q { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
+    Mod+Shift+B { spawn "firefox"; }
+    Mod+Shift+Q { spawn-sh "noctalia msg panel-toggle session"; }
     Mod+P {spawn "dms" "ipc" "call" "notepad" "toggle"; }
     Mod+A { spawn "nautilus"; }
-    Super+L { spawn "dms" "ipc" "call" "lock" "lock"; }
+    Super+L { spawn-sh "noctalia msg session lock"; }
     Mod+K { spawn "kate" "/home/xdenotte/.config/niri/config.kdl"; }
+    Mod+X { spawn-sh "noctalia msg panel-toggle wallpaper"; }
 
-    // Volume Control
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "increment" "3"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "decrement" "3"; }
-    XF86AudioMute        allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "mute"; }
-    XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
-
-    Mod+Q { close-window; }
+    // Volume Control and Brightness
+    XF86AudioRaiseVolume { spawn-sh "noctalia msg volume-up"; }
+    XF86AudioLowerVolume { spawn-sh "noctalia msg volume-down"; }
+    XF86AudioMute { spawn-sh "noctalia msg volume-mute"; }
+    XF86MonBrightnessUp { spawn-sh "noctalia msg brightness-up"; }
+    XF86MonBrightnessDown { spawn-sh "noctalia msg brightness-down"; }
 
     // Focus Movement (Arrows & HJKL)
     Mod+Left { focus-column-left; }
@@ -273,12 +311,10 @@ binds {
     // System Actions
     Ctrl+Alt+Delete { quit; }
     Mod+Shift+P { power-off-monitors; }
-
-    // Brightness Control
-    XF86MonBrightnessUp allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5" ""; }
 }
 
-debug {
-    emulate-zero-presentation-time
+switch-events {
+    lid-close {
+        spawn "noctalia" "msg" "session" "lock"
+    }
 }
